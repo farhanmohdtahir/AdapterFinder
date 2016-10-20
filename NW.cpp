@@ -62,7 +62,6 @@ if(L1 > Fx || L2 > Fy)
         dpm_init( F, traceback, L1, L2, d );
 
         // Create alignment
-
         nw_align( F, traceback, seq_1, seq_2, seq_1_al, seq_2_al, d );
 	
 	if(debug == 2)
@@ -110,75 +109,55 @@ int NW::nw_align(
               int        d         
             )
 {
-        int        checkMatch=0;  //x = 0, y = 0, 
+        int        x = 0, y = 0;
         int        fU, fD, fL ;
-        char       ptr;
-        char       nuc[10000], nuc2[10000] ;
+        char       ptr, nuc ;
         int        i = 0, j = 0, k = -1*10^9999;
 
         const int  a =  2;   /* Match */
         const int  b = -1;   /* Mismatch */
 
-//        const int  s[ 4 ][ 4 ] = { { a, b, b, b },    /* Substitution matrix */
-//                                   { b, a, b, b },
-//                                   { b, b, a, b },
-//                                   { b, b, b, a } } ;
+        const int  s[ 4 ][ 4 ] = { { a, b, b, b },    /* Substitution matrix */
+                                   { b, a, b, b },
+                                   { b, b, a, b },
+                                   { b, b, b, a } } ;
 
         int  L1 = seq_1.length();
         int  L2 = seq_2.length();
-        
-        strncpy(nuc, seq_1.c_str(), sizeof(nuc));
-        strncpy(nuc2, seq_2.c_str(), sizeof(nuc2));
 
-
-        for( i = 0; i < L2; i++ )
+        for( i = 1; i <= L2; i++ )
         {
-                for( j = 0; j < L1; j++ )
-                {  
-                    if (nuc[j]!='N'||nuc[i]!='N')    
-                        if (nuc[j]==nuc2[i]){
-                            checkMatch=a;
-                        }
-                        else if(nuc[j]!=nuc2[i]){
-                            checkMatch=b;
-                        }
-                        else {
-                        checkMatch=0; 
-                        }
-//                    
-//                    max(i, j, d, a, b, nuc, nuc2, F, traceback);
+                for( j = 1; j <= L1; j++ )
+                {
+                        nuc = seq_1[ j-1 ] ;
 
-//                        nuc = seq_1[j-1] ;
-//                       // cout<<nuc;
-//                        switch( nuc )
-//                        {
-//                                case 'A':  x = 0 ;  break ;
-//                                case 'C':  x = 1 ;  break ;
-//                                case 'G':  x = 2 ;  break ;
-//                                case 'T':  x = 3 ;  
-//                        }
-//
-//                        nuc = seq_2[ i-1 ] ;
-//                        //cout<<nuc2;
-//                        switch( nuc )
-//                        {
-//                                case 'A':  y = 0 ;  break ;
-//                                case 'C':  y = 1 ;  break ;
-//                                case 'G':  y = 2 ;  break ;
-//                                case 'T':  y = 3 ;
-//                       }
-                  
-                        
-                        fD = F[ i ][ j ] + checkMatch ;
-                        fU = F[ i ][ j+1 ] - d ;
-                        fL = F[ i+1 ][ j ] - d ;
+                        switch( nuc )
+                        {
+                                case 'A':  x = 0 ;  break ;
+                                case 'C':  x = 1 ;  break ;
+                                case 'G':  x = 2 ;  break ;
+                                case 'T':  x = 3 ;
+                        }
+
+                        nuc = seq_2[ i-1 ] ;
+
+                        switch( nuc )
+                        {
+                                case 'A':  y = 0 ;  break ;
+                                case 'C':  y = 1 ;  break ;
+                                case 'G':  y = 2 ;  break ;
+                                case 'T':  y = 3 ;
+                        }
+
+                        fU = F[ i-1 ][ j ] - d ;
+                        fD = F[ i-1 ][ j-1 ] + s[ x ][ y ] ;
+                        fL = F[ i ][ j-1 ] - d ;
               
-                        F[ i+1 ][ j+1 ] = max( fU, fD, fL, ptr ) ;
+                        F[ i ][ j ] = max( fU, fD, fL, ptr ) ;
 
-                        traceback[ i+1 ][ j+1 ] =  ptr ; 
+                        traceback[ i ][ j ] =  ptr ;
+                      
                 }
-               // cout<<s[x][y]<<endl;
-               // cout<<checkMatch<<endl<<endl;
         }
         i-- ; j-- ;
 
@@ -227,24 +206,27 @@ int NW::nw_align(
         return  0 ;
 }
 
-int  NW::max(int f1, int f2, int f3, char& ptr)     
+int  NW::max( int f1, int f2, int f3, char & ptr )     
 {                                                      
-        int  max = 0;                            
+        int  max = 0 ;                                
 
-        if (f2>=f1 && f2>=f3){
-            max=f2;
-            ptr='\\';
+        if( f1 >= f2 && f1 >= f3 )  
+        {
+                max = f1 ;
+                ptr = '|' ;
         }
-        else if (f1>f3){
-            max=f1;
-            ptr='|';
+        else if( f2 > f3 )              
+        {
+                max = f2 ;
+                ptr = '\\' ;
         }
-        else{
-        max=f3;
-        ptr='-';
+        else
+        {
+                max = f3 ;
+                ptr = '-' ;
         }
         
-        return max;
+        return  max ;   
 }
 
 void  NW::print_matrix( int ** F, string seq_1, string seq_2 )
