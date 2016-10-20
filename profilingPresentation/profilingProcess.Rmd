@@ -1,0 +1,43 @@
+---
+title: "Profiling"
+author: "Farhan Tahir"
+date: "19 October 2016"
+output: ioslides_presentation
+---
+## What I have done so far
+* Make profiling process using gperftools profiling tool
+* Make some change on Rayan's code to make it more optimized.
+* Compile the code with optimization option (example: Os/ -O2/ -O3) to make the program more optimized
+* Reduce cpu time used by original Rayan's code
+
+## Rayan's Original pprof result
+![we can see _nw_align function_ use most cpu time which is 3671 and _max function_ is the second function that use most cpu time which is 599](/export/home/farhan/NetBeansProjects/profilingPresentation/textrayanwithoutO3.png)
+
+## Rayan's Original code in nw_align
+![using switch for this function use most cpu time.](/export/home/farhan/NetBeansProjects/profilingPresentation/nw_alignwithoutO3.png)
+
+## Changed code in nw_align function
+![The code changed by using if else statement](/export/home/farhan/NetBeansProjects/profilingPresentation/nw_alignProfile.png)
+
+## Rayan's Original code in max function
+![This code make the less access if statement on the top](/export/home/farhan/NetBeansProjects/profilingPresentation/maxRayan.png)
+
+## Changed code in max function
+![This code make the more access of if statement on the top](/export/home/farhan/NetBeansProjects/profilingPresentation/maxprofiling.png)
+
+## Profiling's result
+![This is the result of profiling of changed code without any optimization input during compile process.](/export/home/farhan/NetBeansProjects/profilingPresentation/textwithout-O3.png)
+
+## Optimization by compile option
+* Used -O3 (Optimization option to speed up the cpu time for the program that manage big data):
+      * g++ _-O3_ -g -lprofiler main.cpp Input.cpp Input.h CS.cpp CS.h NW.cpp NW.h
+
+## Profiling's result
+![This is the result of profiling after option O3 are used during compile process.](/export/home/farhan/NetBeansProjects/profilingPresentation/textprofile.png)
+
+## What I will continue
+* Try to use sse, mmx or avx to see which option are more compatible to used with level -O3. 
+
+
+
+
