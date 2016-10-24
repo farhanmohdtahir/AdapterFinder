@@ -131,17 +131,18 @@ int NW::nw_align(
         {
                 for( j = 0; j < L1; j++ )
                 {  
-                    if (nuc[j]!='N'||nuc[i]!='N')    
+                    if (nuc[j]!='N'||nuc[i]!='N'){    
                         if (nuc[j]==nuc2[i]){
                             checkMatch=a;
                         }
-                        else if(nuc[j]!=nuc2[i]){
+                        else {
                             checkMatch=b;
                         }
+                    }
                         else {
                         checkMatch=0; 
                         }
-//                         
+                       
                         fD = F[ i ][ j ] + checkMatch ;
                         fU = F[ i ][ j+1 ] - d ;
                         fL = F[ i+1 ][ j ] - d ;
@@ -151,7 +152,6 @@ int NW::nw_align(
                         traceback[ i+1 ][ j+1 ] =  ptr ; 
                 }
         }
-        i-- ; j-- ;
 
         for(int m = 0; m <= L1; m++)
         {
@@ -198,7 +198,7 @@ int NW::nw_align(
         return  0 ;
 }
 
-int  NW::max(int f1, int f2, int f3, char& ptr)     
+inline int  NW::max(int f1, int f2, int f3, char& ptr)     
 {                                                      
         int  max = 0;                            
 

@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
    clock_t t1,t2;
     t1=clock();	 
     //ProfilerStart("result.prof");
-	string file1 = "test.fastq", file2 = "test2.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
+	string file1 = "Breast1_R1_001.fastq", file2 = "Breast1_R2_001.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
   	int opt = 0, seqLength = 0, debugLevel = 0; //check=0;
   	double percentage = 0, confLevel = .0;
   	bool option = false;
@@ -116,7 +116,6 @@ int main(int argc, char *argv[])
 		 if(onlynuc == true)
 		 {
 			seq_1 = line;
-                        q+=1;
 		 }
     	    }
   	    if(line2[0]=='A'||line2[0]=='C'||line2[0]=='G'||line2[0]=='T'||line2[0]=='N')
@@ -135,7 +134,6 @@ int main(int argc, char *argv[])
 		 if(onlynuc2 == true)
 		 {
 			seq_2 = line2;
-                        w+=1;
 		 }
 		 
 // Creating NW and CS objects
@@ -167,8 +165,10 @@ int main(int argc, char *argv[])
 		reverse( seq_2.begin(), seq_2.end() );
 		d.cs(seq_2, colmax); 	
 
-		if(debugLevel == 1 || debugLevel == 2)c.print_nucCount_phred();
-		if(debugLevel == 1 || debugLevel == 2)d.print_nucCount_phred();
+		if(debugLevel == 1 || debugLevel == 2){
+                    c.print_nucCount_phred();
+                    d.print_nucCount_phred();
+                }
 
 		confTrue = 0;
 		c.checkConfidence(confLevel, confTrue, adapLenCount);
