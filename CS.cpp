@@ -24,7 +24,7 @@ void CS::cs(string seq_1, int max)
         
         if(addPrior == 0)
 	{
-		for(int i = 0; i < 20; i++)
+		for(int i = 0; i < 10; i++)
 		{
 			for(int j = 0; j < 4; j++)
 			{
@@ -36,7 +36,7 @@ void CS::cs(string seq_1, int max)
 	
         for(int c = max; c < seq_1.length(); c++)
         {
-	   if(c1 == 20) break;
+	   if(c1 == 10) break;
            switch(seq_1[c])
            {
                case 'A': nucleotidecount [0][c1] += 1;
@@ -56,7 +56,7 @@ void CS::cs(string seq_1, int max)
 
         }
         
-        for(int d = 0; d < 20; d++)
+        for(int d = 0; d < 10; d++)
         {
            int max = -1, count = 0;
            for(int e = 0; e < 4; e++)
@@ -76,9 +76,9 @@ void CS::cs(string seq_1, int max)
 	 if(count == 1)                                             /*Determining nucleotide IUPAC */
            {                                                        /*symbol for consensus seuence.*/ 
 		if(max == 0)consensus[d] = 'A';
-		if(max == 1)consensus[d] = 'C';
-		if(max == 2)consensus[d] = 'G';		
-		if(max == 3)consensus[d] = 'T';
+		else if(max == 1)consensus[d] = 'C';
+		else if(max == 2)consensus[d] = 'G';		
+		else consensus[d] = 'T';
            }
 	 else  
            {
@@ -91,7 +91,7 @@ void CS::cs(string seq_1, int max)
 
 void CS::calc_phred()
 {	
-	for(int i = 0; i < 20; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		float total1 = (nucleotidecount[0][i]+nucleotidecount[1][i]+nucleotidecount[2][i]+nucleotidecount[3][i]);
 		if(nucleotidecount[0][i] != 0)  
@@ -113,7 +113,7 @@ void CS::print_nucCount_phred()
         for(int p = 0; p < 4; p++)
         {
                 cout << nuclist[p] << " ";
-                for(int q = 0; q < 20; q++)
+                for(int q = 0; q < 10; q++)
                 { 
                         if(q > 8) cout << " ";
                                 cout << setw(5) << nucleotidecount [p][q] << " ";
@@ -128,7 +128,7 @@ void CS::print_nucCount_phred()
         for(int p = 0; p < 4; p++)
         {
                 cout << nuclist[p] << " ";
-                for(int q = 0; q < 20; q++)
+                for(int q = 0; q < 10; q++)
                 { 
                         if(q > 8) cout << " ";
                         	cout.precision(4);
@@ -139,30 +139,30 @@ void CS::print_nucCount_phred()
         cout << endl;
 }
 
-void CS::print_cs(int opt = 0)
+void CS::print_cs(int opt)
 {
-        if(opt == 1)
-        {
-        	for(int complement = 0; complement < 20; complement++)
-        	{
+//        if(opt == 1)
+//        {
+//        	for(int complement = 0; complement < 10; complement++)
+//        	{
+//
+//              		 if(consensus[complement] == 'A')
+//             		         consensus[complement] = 'T';
+//            		 else if(consensus[complement] == 'T')
+//             		         consensus[complement] = 'A';
+//             		 else if(consensus[complement] == 'C')
+//             		         consensus[complement] = 'G';
+//              		 else if(consensus[complement] == 'G')
+//                 		 consensus[complement] = 'C';
+//      		}
+//        }
 
-              		 if(consensus[complement] == 'A')
-             		         consensus[complement] = 'T';
-            		 else if(consensus[complement] == 'T')
-             		         consensus[complement] = 'A';
-             		 else if(consensus[complement] == 'C')
-             		         consensus[complement] = 'G';
-              		 else if(consensus[complement] == 'G')
-                 		 consensus[complement] = 'C';
-      		}
-        }
-
-        for(int r = 0; r < 20; r++)
+        for(int r = 0; r < 10; r++)
         {
         	bool noZero = false;	
         	for(int s = 0; s < 4; s++)
         	{
-        		if(nucleotidecount[s][r] != 0)
+                            if(nucleotidecount[s][r] != 0)
         			noZero = true;
         	}
         	if(noZero == true)
@@ -175,7 +175,7 @@ void CS::checkConfidence(double conf, int& confTrue, int adapLenCount)
 	int checkLength = 0;
 	int checkPos = 0;
 
-	for(int a = 0; a < 20; a++)
+	for(int a = 0; a < 10; a++)
 	{
 		Confidence[a]=0;
 		bool highConf = false;
@@ -211,10 +211,10 @@ void CS::checkConfidence(double conf, int& confTrue, int adapLenCount)
 	}
 	else adapterPos = checkPos;
 	
-	if(adapterLength >= 1)
+	if(adapterLength >= 5)
 	{	
 		if(adapterPos == 0)
-			adapterPos = 20;
+			adapterPos = 10;
 		int count = 0;
 		for(int c = 0; c < adapterPos; c++)
 		{

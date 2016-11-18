@@ -1,10 +1,11 @@
 #include "NW.h"
 #include <string.h>
 #include "cmath"
-
+//#include "emmintrin.h"
+//#include "xmmintrin.h"
 using namespace std;
 
-	
+
 
 NW::NW()
 {
@@ -39,6 +40,7 @@ if(count == 0)
       	// Traceback matrix
        	traceback = new char * [ L2+1 ];
        	for( int i = 0; i <= L2; i++ )  traceback[ i ] = new char [ L1 ];
+
        	        
         count++;
 }
@@ -62,16 +64,15 @@ if(L1 > Fx || L2 > Fy)
         dpm_init( F, traceback, L1, L2, d );
 
         // Create alignment
-
-        nw_align( F, traceback, seq_1, seq_2, seq_1_al, seq_2_al, d );
+        nw_align( F, traceback, seq_1, seq_2, seq_1_al, seq_2_al, d);
 	
 	if(debug == 2)
 	{
         	cout << "\nDynamic Programming Matrix: " << "\n\n";
         	print_matrix( F, seq_1, seq_2 );
 
-        	cout << "\nTraceback Matrix: " << "\n\n";
-        	print_traceback( traceback, seq_1, seq_2 );
+        	cout << " \nTraceback Matrix: " << "\n\n";
+//        	print_traceback( traceback, seq_1, seq_2 );
 
 		cout << "\nAligned Sequences: " << "\n\n";
         	print_al( seq_1_al, seq_2_al );  
@@ -101,37 +102,38 @@ void  NW::dpm_init( int ** F, char ** traceback, int L1, int L2, int d )
 }
 
 int NW::nw_align(                   
-              int **     F,
+               int **     F,
               char **    traceback,
               string     seq_1,
               string     seq_2,
               string&    seq_1_al,
               string&    seq_2_al,
-              int        d         
+              int        d
             )
 {
-        int        checkMatch=0;  //x = 0, y = 0, 
-        int        fU, fD, fL ;
+        int         L1 = seq_1.length();
+        int         L2 = seq_2.length(); //x = 0, y = 0, 
+        int checkMatch=0; 
+        int        fU;
+        int        fD;
+        int        fL;
         char       ptr;
-        char       nuc[10000], nuc2[10000] ;
+        char       nuc[L2], nuc2[L1] ;
         int        i = 0, j = 0, k = -1*10^9999;
 
         const int  a =  2;   /* Match */
         const int  b = -1;   /* Mismatch */
 
 
-        int  L1 = seq_1.length();
-        int  L2 = seq_2.length();
         
         strncpy(nuc, seq_1.c_str(), sizeof(nuc));
         strncpy(nuc2, seq_2.c_str(), sizeof(nuc2));
-
-
+        
         for( i = 0; i < L2; i++ )
         {
                 for( j = 0; j < L1; j++ )
                 {  
-                    if (nuc[j]!='N'||nuc[i]!='N'){    
+                    if (nuc[j]!='N'||nuc2[i]!='N'){    
                         if (nuc[j]==nuc2[i]){
                             checkMatch=a;
                         }
@@ -142,17 +144,16 @@ int NW::nw_align(
                         else {
                         checkMatch=0; 
                         }
-                       
-                        fD = F[ i ][ j ] + checkMatch ;
+                        
                         fU = F[ i ][ j+1 ] - d ;
+                        fD = F[ i ][ j ] + checkMatch ;
                         fL = F[ i+1 ][ j ] - d ;
-              
-                        F[ i+1 ][ j+1 ] = max( fU, fD, fL, ptr ) ;
-
-                        traceback[ i+1 ][ j+1 ] =  ptr ; 
+                        
+                        F[ i+1 ][ j+1 ] = max (fU, fD, fL, ptr) ;
+                        traceback[ i+1 ][ j+1 ] = ptr  ; 
                 }
         }
-
+        
         for(int m = 0; m <= L1; m++)
         {
                 if( F[ L2 ][ m ] > k )
@@ -198,7 +199,7 @@ int NW::nw_align(
         return  0 ;
 }
 
-inline int  NW::max(int f1, int f2, int f3, char& ptr)     
+inline int  NW::max( int f1, int f2, int f3, char & ptr )     
 {                                                      
         int  max = 0;                            
 
@@ -216,6 +217,7 @@ inline int  NW::max(int f1, int f2, int f3, char& ptr)
         }
         
         return max;
+
 }
 
 void  NW::print_matrix( int ** F, string seq_1, string seq_2 )

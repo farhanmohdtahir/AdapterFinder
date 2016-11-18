@@ -1,0 +1,2 @@
+library(knitr)
+kable(head(iris[,1:3]), format = "markdown")

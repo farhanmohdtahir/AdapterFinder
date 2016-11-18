@@ -1,4 +1,3 @@
-//#include<gperftools/profiler.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,7 +7,6 @@
 #include "NW.h"
 #include "CS.h"
 #include "time.h"
-
 
 using namespace std;
 
@@ -24,35 +22,32 @@ void print_usage();
 void help();
 
 int main(int argc, char *argv[]) 
-{	
-    //clock
-   clock_t t1,t2;
-    t1=clock();	 
-    //ProfilerStart("result.prof");
-	string file1 = "Breast1_R1_001.fastq", file2 = "Breast1_R2_001.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
-  	int opt = 0, seqLength = 0, debugLevel = 0; //check=0;
-  	double percentage = 0, confLevel = .0;
+{
+    
+	string file1 = "sample1.fastq", file2 = "sample2.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
+  	int opt = 0, seqLength = 0, debugLevel = 0;
+  	double percentage = .0, confLevel = .0;
   	bool option = false;
   	int rowmax = 0, colmax = 0, confTrue, adapLenCount = 0, iteration = 0;
   	bool back = true;
-  	    	    	int q=0,w=0;
+  	int count=1; 
  	string line, line2;
  	bool onlynuc = true;
  	bool onlynuc2 = true;
  	
-          static struct option long_options[] = {
+ 	  static struct option long_options[] = {
         {"help",      no_argument,       0,  'h' },
         {"f1",    required_argument,     0,  'a' },
         {"f2",    required_argument,     0,  'b' },
         {"seql",  optional_argument,     0,  'c' },
         {"perc",  optional_argument,     0,  'd' }, 
         {"conf",  optional_argument,     0,  'e' },  
-        {"debug", optional_argument,     0,  'f' },                                
+	{"debug", optional_argument,     0,  'f' },                                
         {0,                0,            0,   0  }
-        };
+    };
 
-        int long_index =0;
-        while ((opt = getopt_long_only(argc, argv,"", 
+    int long_index =0;
+    while ((opt = getopt_long_only(argc, argv,"", 
                    long_options, &long_index )) != -1) {
         switch (opt) {
              case 'h' : help();option = true;
@@ -72,20 +67,17 @@ int main(int argc, char *argv[])
              default: print_usage(); 
                  exit(EXIT_FAILURE);
         }
-        }
-        //cout<<option;
+    }
+    
     if(seqLength == 0) seqLength = 70;
     if(percentage == 0) percentage = 85;
     if(confLevel == 0) confLevel = 1;
     if(debugLevel == 0) debugLevel = 0;
-       
-    if(option == false) print_usage();
-        
-	if(debugLevel == 0 || debugLevel == 1 || debugLevel == 2){
 
+    if(option == false) print_usage();
+	if(debugLevel == 0 || debugLevel == 1 || debugLevel == 2){
     if(file1 != "" && file2 != "")
     {
-       
     	Input ab;
 	NW b;
  	CS c;
@@ -118,6 +110,7 @@ int main(int argc, char *argv[])
 			seq_1 = line;
 		 }
     	    }
+
   	    if(line2[0]=='A'||line2[0]=='C'||line2[0]=='G'||line2[0]=='T'||line2[0]=='N')
    	    {
 		 onlynuc2 = false;
@@ -137,20 +130,17 @@ int main(int argc, char *argv[])
 		 }
 		 
 // Creating NW and CS objects
-//           reverse( seq_1.begin(), seq_1.end() );     
-//	    ab.complementInput(seq_1);     
-//            cout<<endl;
-          // cout<<"Seq2:"<<seq_2<<endl;
-	   reverse( seq_2.begin(), seq_2.end() );
-	    ab.complementInput(seq_2);    
-            //cout<<seq_2<<endl ;
+				
+	    reverse( seq_2.begin(), seq_2.end() );
+	    ab.complementInput(seq_2);
+
     	    double L1 = seq_1.length();
 	    double L2 = seq_2.length();	   
-
+	
 	    b.nw(seq_1, seq_2, seq_1_al, seq_2_al, debugLevel);
-	   // cout<<seq_1_al<<endl<<endl;
+	    
  
-	    //cout<<b.rowmax<<endl;
+	    
 	    if(b.percentage > percentage && (b.rowmax/L1*100) > seqLength && ((seq_2.length()-b.colmax)/L2*100) > seqLength && b.colmax != 0)
 	    {
           	if(debugLevel == 1 || debugLevel == 2)
@@ -165,56 +155,39 @@ int main(int argc, char *argv[])
 		reverse( seq_2.begin(), seq_2.end() );
 		d.cs(seq_2, colmax); 	
 
-		if(debugLevel == 1 || debugLevel == 2){
-                    c.print_nucCount_phred();
-                    d.print_nucCount_phred();
-                }
+		if(debugLevel == 1 || debugLevel == 2)c.print_nucCount_phred();;
+		if(debugLevel == 1 || debugLevel == 2)d.print_nucCount_phred();
 
 		confTrue = 0;
 		c.checkConfidence(confLevel, confTrue, adapLenCount);
 		d.checkConfidence(confLevel, confTrue, adapLenCount);
-               // cout<<confTrue<<endl;
-                
 		adapLenCount++;
-//                check++;
-//                cout<<check;
+
 		if(confTrue == 2)
 		{
 			cout <<"\n";
 			c.print_cs(0);
-			cout << "	";
+			cout <<endl;
 			d.print_cs(1);
-			cout << "\n\n";
-                        t2=clock();
-    float diff ((float)t2-(float)t1);
-    float seconds = diff / CLOCKS_PER_SEC;
-    cout<<seconds<<endl;
+			cout << "\n\n"<<count;
 			exit(0);
 		}	
 	    }
 	
 // After NW and CS
-               // cout<<debugLevel<<endl; 
-                //cout<<b.percentage<<"   "<<percentage<<"   "<<b.rowmax/L1*100<<"   "<<seqLength<<"   "<<(seq_2.length()-b.colmax)/L2*100<<"   "<<b.colmax<<endl;	    
-    	    }
-
-
-
-  	  }
+		
+    	    }    
+            count++;
+         }
+         cout<<count;
   	  myfile.close();
   	  myfile2.close();
-                         // cout<<q<<endl<<w<<endl;
-  	  cout << "Confidence level could not be achieved...\n";
-          
- 	}
+  	  cout << "Confidence level could not be achieved...\n"; 
+ 	
+        }
         else cout << "Unable to open file"; 
     }}
-    //ProfilerStop();  
-           //clock
- t2=clock();
-    float diff ((float)t2-(float)t1);
-    float seconds = diff / CLOCKS_PER_SEC;
-    cout<<seconds<<endl;
+    
   return 0;
 }
 
