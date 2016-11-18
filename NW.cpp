@@ -72,7 +72,7 @@ if(L1 > Fx || L2 > Fy)
         	print_matrix( F, seq_1, seq_2 );
 
         	cout << "\nTraceback Matrix: " << "\n\n";
-//        	print_traceback( traceback, seq_1, seq_2 );
+        	print_traceback( traceback, seq_1, seq_2, d, L1, L2 );
 
 		cout << "\nAligned Sequences: " << "\n\n";
         	print_al( seq_1_al, seq_2_al );  
@@ -241,6 +241,69 @@ void  NW::print_matrix( int ** F, string seq_1, string seq_2 )
                 }
                 cout << endl;
         }
+}
+
+void  NW::print_traceback( char ** traceback, string seq_1, string seq_2, int d, int L1, int L2 )
+{
+    int checkMatch;
+    char nuc[L1], nuc2[L2] ;
+    const int  a = 2, b= -1;   
+    
+    strncpy(nuc, seq_1.c_str(), sizeof(nuc));
+    strncpy(nuc2, seq_2.c_str(), sizeof(nuc2));
+        
+        cout << "    ";
+        
+        for( int j = 0; j < L1; j++ )
+        {
+                cout << seq_1[ j ] << " ";
+        }
+        cout << endl<< "  ";
+        
+        for( int i = 0; i <=L2 ; i++ )
+        {
+                if( i > 0 )
+                {
+                        cout << seq_2[ i-1 ] << " ";
+                }
+                
+                for(int j=0; j<=L1; j++){
+
+                    if (i==0 || j==0){
+                        cout<<traceback[i][j]<<" ";
+                    }
+                    
+                    else{
+                    
+                    if (nuc[j-1]!='N'||nuc2[i-1]!='N'){    
+                            if (nuc[j-1]==nuc2[i-1]){
+                                checkMatch=a;
+                            }
+                            else {
+                                checkMatch=b;
+                            }
+                        }
+                            else {
+                            checkMatch=0; 
+                            }
+
+                    if (F[i][j]==F[i-1][j-1]+checkMatch){
+                        cout<<'\\'<<" ";
+                    }
+                    
+                    else if (F[i][j]==F[i-1][j]-d){
+                        cout<<'|'<< " ";
+                    }
+
+
+                    else {
+                        cout<<'-'<<" ";
+                    }
+                }
+                    
+              }
+              cout<<endl;
+            }
 }
 
 void  NW::print_al( string& seq_1_al, string& seq_2_al )
