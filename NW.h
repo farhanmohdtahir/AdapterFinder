@@ -7,7 +7,6 @@
 //#include "emmintrin.h"
 //#include "xmmintrin.h"
 
-const int test=200; 
 
 #ifndef NW_H
 #define NW_H
@@ -40,28 +39,12 @@ private:
 	 * @param d Gap penalty
 	 */
 	int nw_align(int ** F, char ** traceback, std::string seq_1, std::string seq_2, std::string& seq_1_al, std::string& seq_2_al, int d);
-	/** Compares the upper, diagonal and left values to determine traceback
-	 * @param f1 The value from Upper Cell
-	 * @param f2 The value from Diagonal Cell
-	 * @param f3 The value from Left Cell
-	 * @param ptr Returns the symbol for the traceback matrix
-         * 
-	 */
-        
-        int max( int f1, int f2, int f3, char & ptr ) ;
 	/** Prints out the dynamic programming matrix
 	 * @param F The dynamic programming matrix
 	 * @param seq_1 Read 1 in the first fastq file
 	 * @param seq_2 Read 2 in the second fastq file
 	 */
-        
 	void  print_matrix( int ** F, std::string seq_1, std::string seq_2 );
-	/** Prints out the traceback matrix
-	 * @param traceback The traceback matrix
-	 * @param seq_1 Read 1 in the first fastq file
-	 * @param seq_2 Read 2 in the second fastq file	
-	 */
-	void  print_traceback( char ** traceback, std::string seq_1, std::string seq_2 );
 	/** Prints out the aligned sequences
 	 * @param seq_1_al Read 1 aligned to Read 2
 	 * @param seq_2_al Read 2 aligned to Read 1	
@@ -76,7 +59,7 @@ private:
 	/** Clears the dynamic programming and traceback matrices
 	 */
 	void clear();
-	//void tracebk(int tracebklength);
+        
 public:
 	/**Main function in the NW class which calls other functions to perform dynamic programming on Reads 1 and Reads 2
 	 * @param seq_1 Read 1 in the first fastq file

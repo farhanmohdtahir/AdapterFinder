@@ -71,7 +71,7 @@ if(L1 > Fx || L2 > Fy)
         	cout << "\nDynamic Programming Matrix: " << "\n\n";
         	print_matrix( F, seq_1, seq_2 );
 
-        	cout << " \nTraceback Matrix: " << "\n\n";
+        	cout << "\nTraceback Matrix: " << "\n\n";
 //        	print_traceback( traceback, seq_1, seq_2 );
 
 		cout << "\nAligned Sequences: " << "\n\n";
@@ -149,8 +149,8 @@ int NW::nw_align(
                         fD = F[ i ][ j ] + checkMatch ;
                         fL = F[ i+1 ][ j ] - d ;
                         
-                        F[ i+1 ][ j+1 ] = max (fU, fD, fL, ptr) ;
-                        traceback[ i+1 ][ j+1 ] = ptr  ; 
+                        F[ i+1 ][ j+1 ] = max(max(fU, fD),fL);
+
                 }
         }
         
@@ -163,31 +163,48 @@ int NW::nw_align(
                 }
         }
         j = rowmax;
-
+        
         while( i > 0  || j > 0 )
         {
-                switch( traceback[ i ][ j ] )                          
-                {
-                        case '|' :      seq_1_al += '-' ;            
-                                        seq_2_al += seq_2[ i-1 ] ; 
-                                        i-- ;
-                                        break ;
-
-                        case '\\':      seq_1_al += seq_1[ j-1 ] ; 
-                                        seq_2_al += seq_2[ i-1 ] ; 
-                                        i-- ;  j-- ; 
-                                        break ;
-
-                        case '-' :      seq_1_al += seq_1[ j-1 ] ; 
-                                        seq_2_al += '-' ; 
-                                        j-- ;
-                }
+            if (nuc[j-1]!='N'||nuc2[i-1]!='N'){    
+                        if (nuc[j-1]==nuc2[i-1]){
+                            checkMatch=a;
+                        }
+                        else {
+                            checkMatch=b;
+                        }
+                    }
+                        else {
+                        checkMatch=0; 
+                        }
+            
+            if (F[i][j]==F[i-1][j]-d){
+                seq_1_al += '-' ;            
+                seq_2_al += seq_2[ i-1 ] ; 
+                i-- ;
+            }
+            
+            else if (F[i][j]==F[i-1][j-1]+checkMatch){
+                seq_1_al += seq_1[ j-1 ] ; 
+                seq_2_al += seq_2[ i-1 ] ; 
+                i-- ;  j-- ; 
+            }
+            
+            else {
+                seq_1_al += seq_1[ j-1 ] ; 
+                seq_2_al += '-' ; 
+                j--;
+            }
 	
 		if(j==0 )
 		{
 			colmax = i;
 			break;						
 		}
+            
+            if(i==0){
+                break;
+            }
         }
 
 
@@ -197,27 +214,6 @@ int NW::nw_align(
         reverse( seq_2_al.begin(), seq_2_al.end() );
 
         return  0 ;
-}
-
-inline int  NW::max( int f1, int f2, int f3, char & ptr )     
-{                                                      
-        int  max = 0;                            
-
-        if (f2>=f1 && f2>=f3){
-            max=f2;
-            ptr='\\';
-        }
-        else if (f1>f3){
-            max=f1;
-            ptr='|';
-        }
-        else{
-        max=f3;
-        ptr='-';
-        }
-        
-        return max;
-
 }
 
 void  NW::print_matrix( int ** F, string seq_1, string seq_2 )
@@ -242,32 +238,6 @@ void  NW::print_matrix( int ** F, string seq_1, string seq_2 )
                 {
                         cout.width( 3 );
                         cout << F[ i ][ j ] << " ";
-                }
-                cout << endl;
-        }
-}
-
-void  NW::print_traceback( char ** traceback, string seq_1, string seq_2 )
-{
-        int  L1 = seq_1.length();
-        int  L2 = seq_2.length();
-
-        cout << "    ";
-        for( int j = 0; j < L1; j++ )
-        {
-                cout << seq_1[ j ] << " ";
-        }
-        cout << "\n  ";
-
-        for( int i = 0; i <= L2; i++ )
-        {
-                if( i > 0 )
-                {
-                        cout << seq_2[ i-1 ] << " ";
-                }
-                for( int j = 0; j <= L1; j++ )
-                {
-                        cout << traceback[ i ][ j ] << " ";
                 }
                 cout << endl;
         }
