@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include <fstream>
 #include <string>
 #include <iomanip>
@@ -30,7 +30,9 @@ int main(int argc, char *argv[])
   	bool option = false;
   	int rowmax = 0, colmax = 0, confTrue, adapLenCount = 0, iteration = 0;
   	bool back = true;
-  	int count=1; 
+  	int count=1,dnaline=1; 
+        int bil=1;
+        
  	string line, line2;
  	bool onlynuc = true;
  	bool onlynuc2 = true;
@@ -72,7 +74,7 @@ int main(int argc, char *argv[])
     if(seqLength == 0) seqLength = 70;
     if(percentage == 0) percentage = 85;
     if(confLevel == 0) confLevel = 1;
-    if(debugLevel == 0) debugLevel = 0;
+    if(debugLevel == 0) debugLevel = 1;
 
     if(option == false) print_usage();
 	if(debugLevel == 0 || debugLevel == 1 || debugLevel == 2){
@@ -86,51 +88,15 @@ int main(int argc, char *argv[])
  	ifstream myfile2 (file2.c_str());
  	if (myfile.is_open() && myfile2.is_open())
   	{
-  	 while (getline (myfile,line) && getline (myfile2,line2))
+  	 while (getline (myfile,seq_1) && getline (myfile2,seq_2))
   	 {
-  	 /*
-  	    ab.checkNucleotide(line, seq_1);
-  	    ab.checkNucleotide(line2, seq_2);	
-  	 */    
- 	    if(line[0]=='A'||line[0]=='C'||line[0]=='G'||line[0]=='T'||line[0]=='N')
-  	    {
-		 onlynuc = false;
-		 for(int a = 0; a < line.length(); a++)
-		 {	
-			if(line[a]=='A'||line[a]=='C'||line[a]=='G'||line[a]=='T'||line[a]=='N')
-				onlynuc = true;
- 			else
-			{ 
-				onlynuc = false;
-				break;
-			}
-		 }
-		 if(onlynuc == true)
-		 {
-			seq_1 = line;
-		 }
-    	    }
+                if(count==dnaline){
+                        myfile>>seq_1;
+                        myfile2>>seq_2;
+                        dnaline+=4;
+//                        cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;//<<dnaline<<endl; 
 
-  	    if(line2[0]=='A'||line2[0]=='C'||line2[0]=='G'||line2[0]=='T'||line2[0]=='N')
-   	    {
-		 onlynuc2 = false;
-		 for(int a = 0; a < line2.length(); a++)
-		 {	
-			if(line2[a]=='A'||line2[a]=='C'||line2[a]=='G'||line2[a]=='T'||line2[a]=='N')
-				onlynuc2 = true;
- 			else
-			{ 
-				onlynuc2 = false;
-				break;
-			}
-		 }
-		 if(onlynuc2 == true)
-		 {
-			seq_2 = line2;
-		 }
-		 
-// Creating NW and CS objects
-				
+          
 	    reverse( seq_2.begin(), seq_2.end() );
 	    ab.complementInput(seq_2);
 
@@ -138,9 +104,8 @@ int main(int argc, char *argv[])
 	    double L2 = seq_2.length();	   
 	
 	    b.nw(seq_1, seq_2, seq_1_al, seq_2_al, debugLevel);
-	    
- 
-	    
+
+//            cout<<b.percentage<<" "<<(b.rowmax/L1*100)<<" "<<b.colmax<<" "<<endl;
 	    if(b.percentage > percentage && (b.rowmax/L1*100) > seqLength && ((seq_2.length()-b.colmax)/L2*100) > seqLength && b.colmax != 0)
 	    {
           	if(debugLevel == 1 || debugLevel == 2)
@@ -169,15 +134,16 @@ int main(int argc, char *argv[])
 			c.print_cs(0);
 			cout <<endl;
 			d.print_cs(1);
-			cout << "\n\n"<<count;
+                        cout<<endl<<bil<<endl;
 			exit(0);
 		}	
 	    }
-	
+
+            ++bil;
 // After NW and CS
-		
-    	    }    
-            count++;
+		}
+//         cout<<count;
+            ++count;
          }
          cout<<count;
   	  myfile.close();
