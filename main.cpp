@@ -1,4 +1,4 @@
-//#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <iomanip>
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   	bool option = false;
   	int rowmax = 0, colmax = 0, confTrue, adapLenCount = 0, iteration = 0;
   	bool back = true;
-  	int count=1,dnaline=1; 
+  	int count=1, separator1=0, separator2=0, seqCount1=0, seqCount2=0;
         int bil=1;
         
  	string line, line2;
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     if(seqLength == 0) seqLength = 70;
     if(percentage == 0) percentage = 85;
     if(confLevel == 0) confLevel = 1;
-    if(debugLevel == 0) debugLevel = 1;
+    if(debugLevel == 0) debugLevel = 0;
 
     if(option == false) print_usage();
 	if(debugLevel == 0 || debugLevel == 1 || debugLevel == 2){
@@ -88,14 +88,53 @@ int main(int argc, char *argv[])
  	ifstream myfile2 (file2.c_str());
  	if (myfile.is_open() && myfile2.is_open())
   	{
-  	 while (getline (myfile,seq_1) && getline (myfile2,seq_2))
+  	 while (getline (myfile,line) && getline (myfile2,line))
   	 {
-                if(count==dnaline){
-                        myfile>>seq_1;
-                        myfile2>>seq_2;
-                        dnaline+=4;
-//                        cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;//<<dnaline<<endl; 
+             myfile>>line;
+             myfile2>>line2;
+      
+                if (line[0]=='A'||line[0]=='T'||line[0]=='G'||line[0]=='C'||line[0]=='N'){
+                    if (separator1==0){ 
+                        seq_1=line;
+                        ++seqCount1;
+                    }
+                    else 
+                    {
+                        --separator1;
+                    }
+                }
+                else if (line[0]=='+'){
+                    separator1+=seqCount1;
+                    seqCount1=0;
+                }
+                else{
+                    if (separator1!=0){
+                        --separator1;
+                    }
+                }
 
+                if (line2[0]=='A'||line2[0]=='T'||line2[0]=='G'||line2[0]=='C'||line[0]=='N'){
+                    
+                    if (separator2==0){
+                        seq_2=line2;  
+                        ++seqCount2;
+                    }
+                    else{
+                        --separator2;
+                    }
+                }
+                else if (line2[0]=='+'){
+                    separator2=seqCount2;
+                    seqCount2=0;
+                }
+                else {       
+                    if (separator2!=0){
+                            --separator2;
+                        } 
+                }
+                
+            if (seq_1==line || seq_2==line2){
+//            cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;
           
 	    reverse( seq_2.begin(), seq_2.end() );
 	    ab.complementInput(seq_2);
@@ -141,11 +180,11 @@ int main(int argc, char *argv[])
 
             ++bil;
 // After NW and CS
-		}
-//         cout<<count;
+            }
+
             ++count;
          }
-         cout<<count;
+
   	  myfile.close();
   	  myfile2.close();
   	  cout << "Confidence level could not be achieved...\n"; 
