@@ -47,14 +47,6 @@ int Input::complementInput(string& seq)
 {
         for(int reverse = 0; reverse < seq.length(); reverse++)
         {
-//               if(seq[reverse] == 'A'){
-//                      seq[reverse] = 'T';}
-//               else if(seq[reverse] == 'T'){
-//                      seq[reverse] = 'A';}
-//               else if(seq[reverse] == 'C'){
-//                      seq[reverse] = 'G';}
-//               else if(seq[reverse] == 'G'){
-//                      seq[reverse] = 'C';}
             switch(seq[reverse]){
                 case 'A': seq[reverse]='T';break;
                 case 'T': seq[reverse]='A';break;
@@ -64,3 +56,44 @@ int Input::complementInput(string& seq)
         }      
 	return 0;
 }
+
+string Input::reform(string file, bool &fourline){
+    bool startline=false;
+    ifstream myfile;
+    ofstream outfile;
+    string line, str;
+    int cmpvar=0;
+    
+    myfile.open(file.c_str(),ios::in);
+    file="4line_"+file;
+    outfile.open(file.c_str(),ios::out); 
+    
+    while (getline(myfile, line)){
+        
+                if (startline==true) {
+                        if(line[0]=='@'||line[0]=='+'){
+                            if (cmpvar==0) str+=line;
+                            else str+="\n"+line;
+                            cmpvar=0;
+                        }      
+                        else {
+                            if (cmpvar==1) str+=line;
+                            else str+="\n"+line;
+                            cmpvar=1;
+                        }
+                    }
+                    
+                else {
+                        if(line[0]=='@'){
+                            startline=true;
+                            str+=line;
+                            cmpvar=0;
+                        }
+                    }
+    }
+            outfile<<str;
+            outfile.close();
+            fourline=true;
+            return file;
+}
+

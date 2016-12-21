@@ -8,6 +8,7 @@
 //#include "xmmintrin.h"
 
 
+
 #ifndef NW_H
 #define NW_H
 
@@ -18,6 +19,7 @@
 	@author Rayan Gan
 	@date April 2015    
  */
+using namespace std;
 class NW
 {
 private:
@@ -38,29 +40,29 @@ private:
 	 * @param seq_2_al Read 2 aligned to Read 1
 	 * @param d Gap penalty
 	 */
-	int nw_align(int ** F, char ** traceback, std::string seq_1, std::string seq_2, std::string& seq_1_al, std::string& seq_2_al, int d);
+	int nw_align(int ** F, char ** traceback, string seq_1, string seq_2, string& seq_1_al, string& seq_2_al, int d);
 	/** Prints out the dynamic programming matrix
 	 * @param F The dynamic programming matrix
 	 * @param seq_1 Read 1 in the first fastq file
 	 * @param seq_2 Read 2 in the second fastq file
 	 */
-	void  print_matrix( int ** F, std::string seq_1, std::string seq_2 );
-	/** Prints out the traceback matrix
+	void  print_matrix( int ** F, string seq_1, string seq_2 );
+        /** Prints out the traceback matrix
 	 * @param traceback The traceback matrix
 	 * @param seq_1 Read 1 in the first fastq file
 	 * @param seq_2 Read 2 in the second fastq file	
 	 */
-	void  print_traceback( char ** traceback, std::string seq_1, std::string seq_2, int d, int L1, int L2 );
-        /** Prints out the aligned sequences
+	void  print_traceback( char ** traceback, string seq_1, string seq_2, int d, int L1, int L2);
+	/** Prints out the aligned sequences
 	 * @param seq_1_al Read 1 aligned to Read 2
 	 * @param seq_2_al Read 2 aligned to Read 1	
 	 */
-	void  print_al( std::string& seq_1_al, std::string&  seq_2_al );
+	void  print_al( string& seq_1_al, string&  seq_2_al );
 	/** Determines the traceback percentage
 	 * @param seq_1_al Read 1 aligned to Read 2
 	 * @param seq_2_al Read 2 aligned to Read 1	
 	 */
-	void verifyPercentage( std::string seq_1_al, std::string seq_2_al );
+	void verifyPercentage( string seq_1_al, string seq_2_al );
 	
 	/** Clears the dynamic programming and traceback matrices
 	 */
@@ -73,7 +75,7 @@ public:
 	 * @param seq_1_al Read 1 aligned to Read 2
 	 * @param seq_2_al Read 2 aligned to Read 1
 	 */
-	int nw(std::string seq_1, std::string seq_2, std::string& seq_1_al, std::string& seq_2_al, int debug);	
+	int nw(string seq_1, string seq_2, string& seq_1_al, string& seq_2_al, int debug);	
 	
 	int rowmax;		/**< Largest value at last row of dynamic programming. */
 	int colmax;		/**< Traceback value at first column of dynamic programming. */

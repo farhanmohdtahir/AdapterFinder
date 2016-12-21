@@ -12,6 +12,7 @@
 	@author Rayan Gan
 	@date April 2015
  */
+using namespace std;
 class CS
 {
 private:
@@ -30,7 +31,7 @@ public:
 	 * @param seq_1 Read 1 in the first fastq file
 	 * @param max Length at which alignment is the best	 
 	 */
-	void cs(std::string seq_1, int max );
+	void cs(string seq_1, int max );
 	/**Calculates the Phred scores of each nucleotide in the nucleotide count
 	 */
 	void calc_phred();

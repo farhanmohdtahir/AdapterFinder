@@ -14,8 +14,8 @@ using namespace std;
 
 	The Paired-End Adapter Finder constructs two consensus adapter sequences from Reads 1 and Reads 2 of paired-end sequencing by using the Needleman-Wunsh algorithm to align the two reads and determining which region of the sequence is actually an adapter. The user has to input two fastq format files, corresponding to Read 1 and Read 2, and the result will be the consensus adapter sequences for both the Adapters in Read 1 and Read 2 respectively of the paired-end sequencing.
 	
-	@author Rayan Gan
-	@date April 2015
+	@author Rayan Gan and Farhan Tahir
+	@date December 2017
  */
  
 void print_usage();
@@ -24,14 +24,13 @@ void help();
 int main(int argc, char *argv[]) 
 {
     
-	string file1 = "sample1.fastq", file2 = "sample2.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
+	string file1 = "test.fastq", file2 = "test2.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
   	int opt = 0, seqLength = 0, debugLevel = 0;
   	double percentage = .0, confLevel = .0;
   	bool option = false;
   	int rowmax = 0, colmax = 0, confTrue, adapLenCount = 0, iteration = 0;
-  	bool back = true;
-  	int count=1, separator1=0, separator2=0, seqCount1=0, seqCount2=0;
-        int bil=1;
+  	bool skip = true, fourline1, fourline2;
+        int bil=1, count=0, idline=0, dnaline=1;
         
  	string line, line2;
  	bool onlynuc = true;
@@ -86,112 +85,128 @@ int main(int argc, char *argv[])
 	CS d;
  	ifstream myfile (file1.c_str());
  	ifstream myfile2 (file2.c_str());
+        ofstream outfile1;
+        ofstream outfile2; 
+
  	if (myfile.is_open() && myfile2.is_open())
   	{
-  	 while (getline (myfile,line) && getline (myfile2,line))
-  	 {
-             myfile>>line;
-             myfile2>>line2;
-      
-                if (line[0]=='A'||line[0]=='T'||line[0]=='G'||line[0]=='C'||line[0]=='N'){
-                    if (separator1==0){ 
-                        seq_1=line;
-                        ++seqCount1;
-                    }
-                    else 
-                    {
-                        --separator1;
-                    }
-                }
-                else if (line[0]=='+'){
-                    separator1+=seqCount1;
-                    seqCount1=0;
-                }
-                else{
-                    if (separator1!=0){
-                        --separator1;
-                    }
-                }
-
-                if (line2[0]=='A'||line2[0]=='T'||line2[0]=='G'||line2[0]=='C'||line[0]=='N'){
-                    
-                    if (separator2==0){
-                        seq_2=line2;  
-                        ++seqCount2;
+            while (getline (myfile,line)) 
+            {
+                   if (count==idline){  
+                       if (line[0]=='@'){
+                           fourline1=true;
+                           idline+=4;
+                       }
+                       else{
+                           fourline1=false;
+                           break;
+                       }
+                   }
+               ++count;
+               if (count>=100) break;
+            }
+        }
+        
+        else {
+            cout << "Unable to open file"; 
+            exit(0);
+        }
+         count=0; idline=0;
+         
+         while(getline(myfile2,line2)){
+                if (count==idline){  
+                    if (line2[0]=='@'){
+                        fourline2=true;
+                        idline+=4;
                     }
                     else{
-                        --separator2;
+                        fourline2=false;
+                        break;
                     }
                 }
-                else if (line2[0]=='+'){
-                    separator2=seqCount2;
-                    seqCount2=0;
-                }
-                else {       
-                    if (separator2!=0){
-                            --separator2;
-                        } 
-                }
-                
-            if (seq_1==line || seq_2==line2){
-//            cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;
-          
-	    reverse( seq_2.begin(), seq_2.end() );
-	    ab.complementInput(seq_2);
+            ++count;
+            if (count>=100) break;
+         }
+         myfile.close();
+         myfile2.close();
+         
+        if (fourline1==true&&fourline2==true) cout<<"This is normal 4-line FASTQ file. "<<endl;
+         
+        else cout<<"This is multi-line FASTQ file."<<endl<<"Reformation into 4-Line FASTQ file..."<<endl;
+         
+        if (fourline1==false) file1=ab.reform(file1, fourline1);
 
-    	    double L1 = seq_1.length();
-	    double L2 = seq_2.length();	   
-	
-	    b.nw(seq_1, seq_2, seq_1_al, seq_2_al, debugLevel);
+        if (fourline2==false) file2=ab.reform(file2, fourline2);
+        
+        if (fourline1==true && fourline2==true){ 
+        ifstream infile1(file1.c_str());
+        ifstream infile2(file2.c_str());
+        count=1;
+        
+        cout<<"Finding adapter..."<<endl;
+        while (getline (infile1,line) && getline (infile2,line2))
+        {
+                     if(count==dnaline){
+                                
+                        infile1>>seq_1;
+                        infile2>>seq_2;
+//                        cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;
+                        dnaline+=4;
+                    
+                    reverse( seq_2.begin(), seq_2.end() );
+                    ab.complementInput(seq_2);
+
+                    double L1 = seq_1.length();
+                    double L2 = seq_2.length();	   
+
+                    b.nw(seq_1, seq_2, seq_1_al, seq_2_al, debugLevel);
 
 //            cout<<b.percentage<<" "<<(b.rowmax/L1*100)<<" "<<b.colmax<<" "<<endl;
-	    if(b.percentage > percentage && (b.rowmax/L1*100) > seqLength && ((seq_2.length()-b.colmax)/L2*100) > seqLength && b.colmax != 0)
-	    {
-          	if(debugLevel == 1 || debugLevel == 2)
-	        {
-	    	    cout<<"\nSeq1:"<<seq_1<<endl;
-	    	    cout<<"Seq2:"<<seq_2<<endl;
-	        }
-	    
-		rowmax = b.rowmax;
-		colmax = seq_2.length()-b.colmax;		
-		c.cs(seq_1, rowmax);
-		reverse( seq_2.begin(), seq_2.end() );
-		d.cs(seq_2, colmax); 	
+                    if(b.percentage > percentage && (b.rowmax/L1*100) > seqLength && ((seq_2.length()-b.colmax)/L2*100) > seqLength && b.colmax != 0)
+                    {
+                        if(debugLevel == 1 || debugLevel == 2)
+                        {
+                            cout<<"\nSeq1:"<<seq_1<<endl;
+                            cout<<"Seq2:"<<seq_2<<endl;
+                        }
 
-		if(debugLevel == 1 || debugLevel == 2)c.print_nucCount_phred();;
-		if(debugLevel == 1 || debugLevel == 2)d.print_nucCount_phred();
+                        rowmax = b.rowmax;
+                        colmax = seq_2.length()-b.colmax;		
+                        c.cs(seq_1, rowmax);
+                        reverse( seq_2.begin(), seq_2.end() );
+                        d.cs(seq_2, colmax); 	
 
-		confTrue = 0;
-		c.checkConfidence(confLevel, confTrue, adapLenCount);
-		d.checkConfidence(confLevel, confTrue, adapLenCount);
-		adapLenCount++;
+                        if(debugLevel == 1 || debugLevel == 2)c.print_nucCount_phred();;
+                        if(debugLevel == 1 || debugLevel == 2)d.print_nucCount_phred();
 
-		if(confTrue == 2)
-		{
-			cout <<"\n";
-			c.print_cs(0);
-			cout <<endl;
-			d.print_cs(1);
-                        cout<<endl<<bil<<endl;
-			exit(0);
-		}	
-	    }
+                        confTrue = 0;
+                        c.checkConfidence(confLevel, confTrue, adapLenCount);
+                        d.checkConfidence(confLevel, confTrue, adapLenCount);
+                        adapLenCount++;
 
-            ++bil;
-// After NW and CS
-            }
+                        if(confTrue == 2)
+                        {
+                                cout <<"\n";
+                                c.print_cs(0);
+                                cout <<endl;
+                                d.print_cs(1);
+                                cout<<endl<<bil<<endl;
+                                exit(0);
+                        }	
+                    }
 
-            ++count;
-         }
+                    ++bil;
+        // After NW and CS
+                    }
 
-  	  myfile.close();
-  	  myfile2.close();
+                    ++count;
+                 }
+  	  infile1.close();
+  	  infile2.close();
   	  cout << "Confidence level could not be achieved...\n"; 
- 	
         }
-        else cout << "Unable to open file"; 
-    }}
+    }
+}
     
   return 0;
 }
