@@ -18,9 +18,9 @@ CS::CS()
 	addPrior = 0;
 }
 
-void CS::cs(string seq_1, int max)      
+void CS::cs(string seq_1, int max, int & c1)      
 { 						                     	               	
-        int c1 = 0;
+        c1 = 0;
         
         if(addPrior == 0)
 	{
@@ -53,7 +53,6 @@ void CS::cs(string seq_1, int max)
 			 nucleotidecount [3][c1] += 1;
            }
 	   c1++;
-
         }
         
         for(int d = 0; d < 20; d++)
@@ -74,7 +73,7 @@ void CS::cs(string seq_1, int max)
            }
 	
 	 if(count == 1)                                             /*Determining nucleotide IUPAC */
-           {                                                        /*symbol for consensus seuence.*/ 
+           {                                                        /*symbol for consensus sequence.*/ 
 		if(max == 0)consensus[d] = 'A';
 		if(max == 1)consensus[d] = 'C';
 		if(max == 2)consensus[d] = 'G';		
@@ -139,11 +138,11 @@ void CS::print_nucCount_phred()
         cout << endl;
 }
 
-void CS::print_cs(int opt = 0)
+void CS::print_cs(int c, int opt = 0)
 {
         if(opt == 1)
         {
-        	for(int complement = 0; complement < 20; complement++)
+        	for(int complement = 0; complement < c; complement++)
         	{
 
               		 if(consensus[complement] == 'A')
@@ -157,7 +156,7 @@ void CS::print_cs(int opt = 0)
       		}
         }
 
-        for(int r = 0; r < 20; r++)
+        for(int r = 0; r < c; r++)
         {
         	bool noZero = false;	
         	for(int s = 0; s < 4; s++)
@@ -215,7 +214,7 @@ int checkPos = 0;
 	{	
 		if(adapterPos == 0)
 			adapterPos = 20;
-		int count = 0;
+		int count = 0;  
 		for(int c = 0; c < adapterPos; c++)
 		{
 			if(Confidence[c] == 1)

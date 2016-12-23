@@ -15,7 +15,7 @@ using namespace std;
 	The Paired-End Adapter Finder constructs two consensus adapter sequences from Reads 1 and Reads 2 of paired-end sequencing by using the Needleman-Wunsh algorithm to align the two reads and determining which region of the sequence is actually an adapter. The user has to input two fastq format files, corresponding to Read 1 and Read 2, and the result will be the consensus adapter sequences for both the Adapters in Read 1 and Read 2 respectively of the paired-end sequencing.
 	
 	@author Rayan Gan and Farhan Tahir
-	@date December 2017
+	@date January 2017
  */
  
 void print_usage();
@@ -24,13 +24,13 @@ void help();
 int main(int argc, char *argv[]) 
 {
     
-	string file1 = "test.fastq", file2 = "test2.fastq", seq_1, seq_2, seq_1_al, seq_2_al;
+	string file1 = "", file2 = "", seq_1, seq_2, seq_1_al, seq_2_al;
   	int opt = 0, seqLength = 0, debugLevel = 0;
   	double percentage = .0, confLevel = .0;
   	bool option = false;
   	int rowmax = 0, colmax = 0, confTrue, adapLenCount = 0, iteration = 0;
   	bool skip = true, fourline1, fourline2;
-        int bil=1, count=0, idline=0, dnaline=1;
+        int bil=1, count=0, idline=0, dnaline=1, adapMax1=0, adapMax2=0, c1, c2;
         
  	string line, line2;
  	bool onlynuc = true;
@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
         ofstream outfile1;
         ofstream outfile2; 
 
+//  Determine whether both Input file is multi-line FASTQ file or 4-line FASTQ file
  	if (myfile.is_open() && myfile2.is_open())
   	{
             while (getline (myfile,line)) 
@@ -103,14 +104,9 @@ int main(int argc, char *argv[])
                        }
                    }
                ++count;
-               if (count>=100) break;
-            }
-        }
-        
-        else {
-            cout << "Unable to open file"; 
-            exit(0);
-        }
+               if (count>=200) break;
+            }        
+
          count=0; idline=0;
          
          while(getline(myfile2,line2)){
@@ -125,19 +121,27 @@ int main(int argc, char *argv[])
                     }
                 }
             ++count;
-            if (count>=100) break;
+            if (count>=200) break;
          }
          myfile.close();
          myfile2.close();
+        }
          
-        if (fourline1==true&&fourline2==true) cout<<"This is normal 4-line FASTQ file. "<<endl;
+        else {
+            cout << "Unable to open file"; 
+            exit(0);
+        }         
          
-        else cout<<"This is multi-line FASTQ file."<<endl<<"Reformation into 4-Line FASTQ file..."<<endl;
+        if (fourline1==true&&fourline2==true) cout<<"This is normal 4-line FASTQ file. "<<endl<<endl;
+          
+        else cout<<"This is multi-line FASTQ file."<<endl<<"Reformation into 4-Line FASTQ file..."<<endl<<endl;
          
+//Reformation of multi-line FASTQ file into 4-line FASTQ file     
         if (fourline1==false) file1=ab.reform(file1, fourline1);
 
         if (fourline2==false) file2=ab.reform(file2, fourline2);
-        
+ 
+//Finding Adapter sequence
         if (fourline1==true && fourline2==true){ 
         ifstream infile1(file1.c_str());
         ifstream infile2(file2.c_str());
@@ -150,9 +154,9 @@ int main(int argc, char *argv[])
                                 
                         infile1>>seq_1;
                         infile2>>seq_2;
-//                        cout<<seq_1<<" "<<seq_1.length()<<endl<<seq_2<<" "<<seq_2.length()<<endl<<endl;
                         dnaline+=4;
-                    
+                        
+// Creating NW and CS objects                    
                     reverse( seq_2.begin(), seq_2.end() );
                     ab.complementInput(seq_2);
 
@@ -161,7 +165,6 @@ int main(int argc, char *argv[])
 
                     b.nw(seq_1, seq_2, seq_1_al, seq_2_al, debugLevel);
 
-//            cout<<b.percentage<<" "<<(b.rowmax/L1*100)<<" "<<b.colmax<<" "<<endl;
                     if(b.percentage > percentage && (b.rowmax/L1*100) > seqLength && ((seq_2.length()-b.colmax)/L2*100) > seqLength && b.colmax != 0)
                     {
                         if(debugLevel == 1 || debugLevel == 2)
@@ -171,10 +174,10 @@ int main(int argc, char *argv[])
                         }
 
                         rowmax = b.rowmax;
-                        colmax = seq_2.length()-b.colmax;		
-                        c.cs(seq_1, rowmax);
+                        colmax = seq_2.length()-b.colmax;                    
+                        c.cs(seq_1, rowmax, c1);
                         reverse( seq_2.begin(), seq_2.end() );
-                        d.cs(seq_2, colmax); 	
+                        d.cs(seq_2, colmax, c2); 
 
                         if(debugLevel == 1 || debugLevel == 2)c.print_nucCount_phred();;
                         if(debugLevel == 1 || debugLevel == 2)d.print_nucCount_phred();
@@ -182,15 +185,17 @@ int main(int argc, char *argv[])
                         confTrue = 0;
                         c.checkConfidence(confLevel, confTrue, adapLenCount);
                         d.checkConfidence(confLevel, confTrue, adapLenCount);
-                        adapLenCount++;
+                        adapLenCount++;                        
+                        if (c1>adapMax1) adapMax1=c1;
+                        if (c2>adapMax2) adapMax2=c2;
 
                         if(confTrue == 2)
                         {
-                                cout <<"\n";
-                                c.print_cs(0);
-                                cout <<endl;
-                                d.print_cs(1);
-                                cout<<endl<<bil<<endl;
+                                cout <<endl<<"Adapter in FASTQ file 1: ";
+                                c.print_cs(adapMax1, 0);
+                                cout <<endl<<"Adapter in FASTQ file 2: ";
+                                d.print_cs(adapMax2, 1);
+                                cout<<endl;
                                 exit(0);
                         }	
                     }

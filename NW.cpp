@@ -68,11 +68,11 @@ if(L1 > Fx || L2 > Fy)
 	
 	if(debug == 2)
 	{
-        	cout << "\nDynamic Programming Matrix: " << "\n\n";
-        	print_matrix( F, seq_1, seq_2 );
-
-        	cout << "\nTraceback Matrix: " << "\n\n";
-        	print_traceback( traceback, seq_1, seq_2, d, L1, L2 );
+//        	cout << "\nDynamic Programming Matrix: " << "\n\n";
+//        	print_matrix( F, seq_1, seq_2 );
+//
+//        	cout << "\nTraceback Matrix: " << "\n\n";
+//        	print_traceback( traceback, seq_1, seq_2, d, L1, L2 );
 
 		cout << "\nAligned Sequences: " << "\n\n";
         	print_al( seq_1_al, seq_2_al );  

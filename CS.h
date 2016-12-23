@@ -31,14 +31,14 @@ public:
 	 * @param seq_1 Read 1 in the first fastq file
 	 * @param max Length at which alignment is the best	 
 	 */
-	void cs(string seq_1, int max );
+	void cs(string seq_1, int max, int & c1 );
 	/**Calculates the Phred scores of each nucleotide in the nucleotide count
 	 */
 	void calc_phred();
 	/**Prints out the Consensus Sequence
 	 * @param opt Option to choose if Read 1 or Read 2 (0 - Read 1, 1 - Read 2)
 	 */
-	void print_cs(int opt);
+	void print_cs(int c, int opt);
 	/**Prints out the nucleotide count and Phred scores
 	 */	
 	void print_nucCount_phred();

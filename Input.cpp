@@ -11,9 +11,9 @@ using namespace std;
 
 /** @brief The Input Class transforms the sequences to be used in the Adapter Sequencer.      
 
-	The Input Class is responsible to reverse complement Read 2 before dynamic programming is done. 
-	@author Rayan Gan
-	@date April 2015
+	The Input Class is responsible to reform multi-line FASTQ file into 4-line FASTQ file (in case) and reverse complement Read 2 before dynamic programming is done. 
+	@author Rayan Gan and Farhan Tahir
+	@date January 2017
  */
 
 int Input::checkNucleotide(string line, string& seq)
@@ -57,6 +57,8 @@ int Input::complementInput(string& seq)
 	return 0;
 }
 
+//Function to reformat the multi-line FASTQ file into 4-line FASTQ file
+
 string Input::reform(string file, bool &fourline){
     bool startline=false;
     ifstream myfile;
@@ -71,15 +73,44 @@ string Input::reform(string file, bool &fourline){
     while (getline(myfile, line)){
         
                 if (startline==true) {
-                        if(line[0]=='@'||line[0]=='+'){
+                        if(line[0]=='@'){
                             if (cmpvar==0) str+=line;
-                            else str+="\n"+line;
+                            
+                            else{
+                            str+="\n"+line;
                             cmpvar=0;
-                        }      
+                            }
+                        }     
+                        
+                        else if(line[0]=='A'||line[0]=='T'||line[0]=='G'||line[0]=='C'||line[0]=='N'){                           
+                            if (cmpvar==1||cmpvar==3) str+=line;
+                            else if (cmpvar==0) {
+                                str+="\n"+line;
+                                cmpvar=1;
+                            }
+                            else if (cmpvar==2) {
+                                str+="\n"+line;
+                                cmpvar=3;
+                            }
+                        }
+                        
+                        else if(line[0]=='+'){
+                            if (cmpvar==2) str+=line;
+                            else{
+                            str+="\n"+line;
+                            cmpvar=2;
+                            }
+                        }
+                        
                         else {
-                            if (cmpvar==1) str+=line;
-                            else str+="\n"+line;
-                            cmpvar=1;
+                            if (cmpvar==0) str+=line;
+                            
+                            else if (cmpvar==2) {
+                                str+="\n"+line;
+                                cmpvar=3;
+                            }
+                            else str+=line;
+                            
                         }
                     }
                     
